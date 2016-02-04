@@ -62,3 +62,7 @@
 /unittests/lib_pubsub_provider_actual.py
 wingdbstub.py*
 
+# pyenv version file
+.python-version
+
+/config.log
