@@ -10,15 +10,15 @@
 import etgtools
 import etgtools.tweaker_tools as tools
 
-PACKAGE   = "wx"   
+PACKAGE   = "wx"
 MODULE    = "_core"
 NAME      = "toplevel"   # Base name of the file to generate to for this script
 DOCSTRING = ""
 
 # The classes and/or the basename of the Doxygen XML files to be processed by
-# this script. 
-ITEMS  = [ 'wxTopLevelWindow' ]    
-    
+# this script.
+ITEMS  = [ 'wxTopLevelWindow' ]
+
 #---------------------------------------------------------------------------
 
 def run():
@@ -27,7 +27,7 @@ def run():
                                 check4unittest=False)
     etgtools.parseDoxyXML(module, ITEMS)
     module.check4unittest = False
-    
+
     #-----------------------------------------------------------------
     # Tweak the parsed meta objects in the module object as needed for
     # customizing the generated code and docstrings.
@@ -37,11 +37,11 @@ def run():
     module.addGlobalStr('wxFrameNameStr', c)
 
     c.find('wxTopLevelWindow.title').default = 'wxEmptyString'
-    c.find('Create.title').default = 'wxEmptyString'    
-    
-    c.find('HandleSettingChange').ignore()
-    c.find('SetLeftMenu').ignore()
-    c.find('SetRightMenu').ignore()
+    c.find('Create.title').default = 'wxEmptyString'
+
+    # c.find('HandleSettingChange').ignore()
+    # c.find('SetLeftMenu').ignore()
+    # c.find('SetRightMenu').ignore()
     c.find('IsUsingNativeDecorations').ignore()
     c.find('UseNativeDecorations').ignore()
     c.find('UseNativeDecorationsByDefault').ignore()
@@ -76,16 +76,15 @@ def run():
     c.addProperty('TmpDefaultItem GetTmpDefaultItem SetTmpDefaultItem')
     c.addProperty('OSXModified OSXIsModified OSXSetModified')
     c.addProperty('MacMetalAppearance MacGetMetalAppearance MacSetMetalAppearance')
-    
+
     tools.fixTopLevelWindowClass(c)
     c.find('ShouldPreventAppExit').isVirtual = True
-    
+
     #-----------------------------------------------------------------
     tools.doCommonTweaks(module)
     tools.runGenerators(module)
-    
-    
+
+
 #---------------------------------------------------------------------------
 if __name__ == '__main__':
     run()
-
