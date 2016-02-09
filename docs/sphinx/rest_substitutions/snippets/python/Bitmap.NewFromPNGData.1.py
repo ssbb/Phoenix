@@ -1,0 +1,2 @@
+    
+    #include <wx./imagpng.h>
