@@ -66,3 +66,4 @@ wingdbstub.py*
 .python-version
 
 /config.log
+/.env
