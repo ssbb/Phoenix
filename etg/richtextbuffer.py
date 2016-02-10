@@ -304,6 +304,8 @@ def run():
     #-------------------------------------------------------
     c = module.find('wxRichTextImage')
     _fixDrawObject(c)
+    c.find('LoadAndScaleImageCache.delayLoading').type = 'wxRichTextDrawingContext&'
+    c.find('LoadAndScaleImageCache.delayLoading').name = 'context'
 
     #-------------------------------------------------------
     c = module.find('wxRichTextBuffer')

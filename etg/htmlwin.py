@@ -42,16 +42,10 @@ def run():
     c.find('OnCellClicked').ignore(False)
     c.find('OnCellMouseHover').ignore(False)
 
-    tools.fixHtmlSetFonts(c)
+    for name in ['SetDefaultHTMLCursor', 'GetDefaultHTMLCursor']:
+        c.find(name).find('type').type = 'wxHtmlWindowInterface::HTMLCursor'
 
-    # Add wxHtmlWindowinterface enums
-    from etgtools import EnumDef, EnumValueDef
-    e = EnumDef(name='HTMLCursor')
-    e.items.extend([ EnumValueDef(name='HTMLCursor_Default'),
-                     EnumValueDef(name='HTMLCursor_Link'),
-                     EnumValueDef(name='HTMLCursor_Text'),
-                     ])
-    module.insertItem(0, e)
+    tools.fixHtmlSetFonts(c)
 
     # Pure virtuals inherited from wxHtmlWindowInterface
     c.addItem(etgtools.WigCode("""\

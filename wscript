@@ -7,10 +7,15 @@
 # License:     wxWindows License
 #-----------------------------------------------------------------------------
 
-import sys
 import os
+import sys
 
 import buildtools.config
+#
+# This is a copy of WAF's check_python_headers with some problematic stuff ripped out.
+#
+from waflib.Configure import conf
+
 cfg = buildtools.config.Config(True)
 
 #-----------------------------------------------------------------------------
@@ -34,7 +39,7 @@ def options(opt):
     opt.load('python')
 
     opt.add_option('--debug', dest='debug', action='store_true', default=False,
-                   help='Turn on debug compile options.')        
+                   help='Turn on debug compile options.')
     opt.add_option('--python', dest='python', default='', action='store',
                    help='Full path to the Python executable to use.')
     opt.add_option('--wx_config', dest='wx_config', default='wx-config', action='store',
@@ -62,8 +67,8 @@ def options(opt):
 
 
 
-def configure(conf):    
-    if isWindows:        
+def configure(conf):
+    if isWindows:
         # For now simply choose the compiler version based on the Python
         # version. We have a chicken-egg problem here. The compiler needs to
         # be selected before the Python stuff can be configured, but we need
@@ -87,7 +92,7 @@ def configure(conf):
     if isWindows:
         # Search for the Python headers without doing some stuff that could
         # iccorectly fail on Windows. See my_check_python_headers below.
-        conf.my_check_python_headers()  
+        conf.my_check_python_headers()
     else:
         conf.check_python_headers()
 
@@ -158,7 +163,7 @@ def configure(conf):
                 lst[1:1] = ['/Z7']
             conf.env['LINKFLAGS_PYEXT'].append('/DEBUG')
 
-    else: 
+    else:
         # Configuration stuff for non-Windows ports using wx-config
         conf.env.CFLAGS_WX   = list()
         conf.env.CXXFLAGS_WX = list()
@@ -171,49 +176,49 @@ def configure(conf):
 
         # Check wx-config exists and fetch some values from it
         rpath = ' --no-rpath' if not conf.options.no_magic else ''
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs core,net' + rpath,
                        uselib_store='WX', mandatory=True)
 
         # Run it again with different libs options to get different
         # sets of flags stored to use with varous extension modules below.
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs adv,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs adv,core,net' + rpath,
                        uselib_store='WXADV', mandatory=True)
 
         libname = '' if cfg.MONOLITHIC else 'stc,' # workaround bug in wx-config
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args=('--cxxflags --libs %score,net' % libname) + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args=('--cxxflags --libs %score,net' % libname) + rpath,
                        uselib_store='WXSTC', mandatory=True)
 
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs html,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs html,core,net' + rpath,
                        uselib_store='WXHTML', mandatory=True)
 
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs gl,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs gl,core,net' + rpath,
                        uselib_store='WXGL', mandatory=True)
 
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs webview,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs webview,core,net' + rpath,
                        uselib_store='WXWEBVIEW', mandatory=True)
 
         if isDarwin:
-            conf.check_cfg(path=conf.options.wx_config, package='', 
-                           args='--cxxflags --libs core,net' + rpath, 
+            conf.check_cfg(path=conf.options.wx_config, package='',
+                           args='--cxxflags --libs core,net' + rpath,
                            uselib_store='WXWEBKIT', mandatory=True)
 
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs xml,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs xml,core,net' + rpath,
                        uselib_store='WXXML', mandatory=True)
 
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs xrc,xml,core,net' + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs xrc,xml,core,net' + rpath,
                        uselib_store='WXXRC', mandatory=True)
 
         libname = '' if cfg.MONOLITHIC else 'richtext,' # workaround bug in wx-config
-        conf.check_cfg(path=conf.options.wx_config, package='', 
-                       args='--cxxflags --libs %score,net' % libname + rpath, 
+        conf.check_cfg(path=conf.options.wx_config, package='',
+                       args='--cxxflags --libs %score,net' % libname + rpath,
                        uselib_store='WXRICHTEXT', mandatory=True)
 
         # ** Add code for new modules here
@@ -261,20 +266,16 @@ def configure(conf):
 
         # Some Mac-specific stuff
         if isDarwin:
-            conf.env.MACOSX_DEPLOYMENT_TARGET = "10.5"  
+            conf.env.MACOSX_DEPLOYMENT_TARGET = "10.7"
 
             if conf.options.mac_arch:
-                conf.env.ARCH_WXPY = conf.options.mac_arch.split(',')        
+                conf.env.ARCH_WXPY = conf.options.mac_arch.split(',')
 
     #import pprint
     #pprint.pprint( [(k, conf.env[k]) for k in conf.env.keys()] )
 
 
 
-#
-# This is a copy of WAF's check_python_headers with some problematic stuff ripped out.
-#
-from waflib.Configure import conf
 
 @conf
 def my_check_python_headers(conf):
@@ -322,43 +323,43 @@ def my_check_python_headers(conf):
 
     if isWindows:
         libname = 'python' + conf.env['PYTHON_VERSION'].replace('.', '')
-        
+
         # TODO: libpath will be incorrect in virtualenv's.  Fix this...
-        libpath = [os.path.join(dct['prefix'], "libs")]       
-        
+        libpath = [os.path.join(dct['prefix'], "libs")]
+
         conf.env['LIBPATH_PYEMBED'] = libpath
         conf.env.append_value('LIB_PYEMBED', [libname])
         conf.env['LIBPATH_PYEXT'] = conf.env['LIBPATH_PYEMBED']
         conf.env['LIB_PYEXT'] = conf.env['LIB_PYEMBED']
-       
+
     else:
         result = None
         for name in ('python' + env['PYTHON_VERSION'], 'python' + env['PYTHON_VERSION'].replace('.', '')):
-    
+
             # LIBPATH_PYEMBED is already set; see if it works.
             if not result and env['LIBPATH_PYEMBED']:
                 path = env['LIBPATH_PYEMBED']
                 conf.to_log("\n\n# Trying default LIBPATH_PYEMBED: %r\n" % path)
                 result = conf.check(lib=name, uselib='PYEMBED', libpath=path, mandatory=False, msg='Checking for library %s in LIBPATH_PYEMBED' % name)
-    
+
             if not result and dct['LIBDIR']:
                 path = [dct['LIBDIR']]
                 conf.to_log("\n\n# try again with -L$python_LIBDIR: %r\n" % path)
                 result = conf.check(lib=name, uselib='PYEMBED', libpath=path, mandatory=False, msg='Checking for library %s in LIBDIR' % name)
-    
+
             if not result and dct['LIBPL']:
                 path = [dct['LIBPL']]
                 conf.to_log("\n\n# try again with -L$python_LIBPL (some systems don't install the python library in $prefix/lib)\n")
                 result = conf.check(lib=name, uselib='PYEMBED', libpath=path, mandatory=False, msg='Checking for library %s in python_LIBPL' % name)
-    
+
             if not result:
                 path = [os.path.join(dct['prefix'], "libs")]
                 conf.to_log("\n\n# try again with -L$prefix/libs, and pythonXY name rather than pythonX.Y (win32)\n")
                 result = conf.check(lib=name, uselib='PYEMBED', libpath=path, mandatory=False, msg='Checking for library %s in $prefix/libs' % name)
-    
+
             if result:
                 break # do not forget to set LIBPATH_PYEMBED
-    
+
         if result:
             env['LIBPATH_PYEMBED'] = path
             env.append_value('LIB_PYEMBED', [name])
@@ -425,7 +426,7 @@ def build(bld):
         "# This file was generated by Phoenix's wscript.\n\n"
         "VERSION_STRING = '%(VERSION)s'\n"
         % cfg.__dict__)
-        
+
 
     # copy the wx locale message catalogs to the package dir
     if isWindows or isDarwin:
@@ -450,7 +451,7 @@ def build(bld):
                     'sip/siplib/voidptr.c',
                     ],
         uselib   = 'WX WXPY',
-    )  
+    )
     makeExtCopyRule(bld, 'siplib')
 
 
@@ -517,14 +518,14 @@ def build(bld):
         )
     makeExtCopyRule(bld, '_glcanvas')
 
-
-    etg = loadETG('etg/_html2.py')
-    bld(features = 'c cxx cxxshlib pyext',
-        target   = makeTargetName(bld, '_html2'),
-        source   = getEtgSipCppFiles(etg) + rc,
-        uselib   = 'WXWEBVIEW WXPY',
-        )
-    makeExtCopyRule(bld, '_html2')
+    if isWindows or cfg.getWxConfigValue('--optional-libs webview'):
+        etg = loadETG('etg/_html2.py')
+        bld(features = 'c cxx cxxshlib pyext',
+            target   = makeTargetName(bld, '_html2'),
+            source   = getEtgSipCppFiles(etg) + rc,
+            uselib   = 'WXWEBVIEW WXPY',
+            )
+        makeExtCopyRule(bld, '_html2')
 
     if isDarwin:
         etg = loadETG('etg/_webkit.py')
@@ -599,11 +600,11 @@ def makeExtCopyRule(bld, name):
 
 
 # This is the task function to be called by the above rule.
-def copyFileToPkg(task): 
+def copyFileToPkg(task):
     from distutils.file_util import copy_file
     from buildtools.config   import opj
-    src = task.inputs[0].abspath() 
-    tgt = task.outputs[0].abspath() 
+    src = task.inputs[0].abspath()
+    tgt = task.outputs[0].abspath()
     task.exec_command('touch %s' % tgt)
     tgt = opj(cfg.PKGDIR, os.path.basename(src))
     copy_file(src, tgt, verbose=1)
