@@ -86,7 +86,6 @@ def run():
 
     # avoid ambiguity between wxItemContainer and wxTextEntry
     c.find('IsEmpty').ignore()
-    c.addPyCode("IsEmpty = wx.deprecated(IsTextEmpty, 'Use IsListEmpty() or IsTextEmpty() instead.')")
 
     #-----------------------------------------------------------------
     tools.doCommonTweaks(module)

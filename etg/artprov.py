@@ -46,8 +46,7 @@ def run():
     c.find('Remove.provider').transferBack = True
 
     c.find("Insert").ignore()
-    c.addPyCode("Insert = wx.deprecated(PushBack, 'Use PushBack instead.')")
-
+    c.addPyCode("ArtProvider.Insert = wx.deprecated(ArtProvider.PushBack, 'Use PushBack instead.')")
 
     # Change the types of the art constants from wxString to const char*
     # since that is what they really are.

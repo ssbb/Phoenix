@@ -68,8 +68,7 @@ def run():
     f.overloads = []
 
     module.find("wxUsleep").ignore()
-    module.addPyCode("wxUsleep = wx.deprecated(wxMilliSleep, 'Use wxMicroSleep or wxMilliSleep instead.')")
-
+    module.addPyCode("Usleep = wx.deprecated(MilliSleep, 'Use MicroSleep or MilliSleep instead.')")
 
     module.find('wxGetOsVersion.major').out = True
     module.find('wxGetOsVersion.minor').out = True
