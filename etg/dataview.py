@@ -233,6 +233,10 @@ def run():
         method.find('value').out = True
         method.cppSignature = sig
 
+    def _fixCtorStaticGetDefaultType(method):
+        param = method.find('varianttype')
+        param.default = '{}::{}'.format(name, param.default)
+
 
     c = module.find('wxDataViewRenderer')
     c.addPrivateCopyCtor()
@@ -270,11 +274,17 @@ def run():
             %Property(name=Value, get=GetValue, set=SetValue)
             """))
 
+        try:
+            # Fix constructor static method param
+            _fixCtorStaticGetDefaultType(c.find(name))
+        except:
+            continue
 
     c = module.find('wxDataViewCustomRenderer')
     _fixupBoolGetters(c.find('GetValueFromEditorCtrl'),
                       'bool (wxWindow * editor, wxDVCVariant& value)')
     c.find('GetTextExtent').ignore(False)
+    _fixCtorStaticGetDefaultType(c.find('wxDataViewCustomRenderer'))
 
     module.addPyCode("""\
         PyDataViewCustomRenderer = wx.deprecated(DataViewCustomRenderer,
@@ -334,8 +344,6 @@ def run():
     tools.fixWindowClass(c)
     module.addGlobalStr('wxDataViewCtrlNameStr', c)
 
-    c.find('GetSortingColumns').ignore()
-
     c.find('AssociateModel.model').transfer = True
     c.find('AssociateModel').pyName = '_AssociateModel'
     c.addPyMethod('AssociateModel', '(self, model)',
@@ -364,6 +372,9 @@ def run():
         body="return [self.GetColumn(i) for i in range(self.GetColumnCount())]")
 
     c.find('GetSelections').ignore()
+    c.find('GetSortingColumns').ignore()         # TODO: fix <wxVector> issue
+    c.find('IsMultiColumnSortAllowed').ignore()  # TODO: fix const issue
+
     c.addCppMethod('wxDataViewItemArray*', 'GetSelections', '()',
         isConst=True, factory=True,
         doc="Returns a list of the currently selected items.",
