@@ -67,3 +67,4 @@ wingdbstub.py*
 
 /config.log
 /.env
+.DS_Store
