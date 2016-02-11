@@ -232,13 +232,12 @@ Version 0.8
 
 """
 
-import wx
-import math
 import bisect
+import math
 import zlib
 
+import wx
 import wx.lib.six as six
-
 from wx.lib.expando import ExpandoTextCtrl
 
 # Version Info
@@ -346,11 +345,6 @@ ULC_STATE_DROPHILITED =   wx.LIST_STATE_DROPHILITED      # MSW only
 ULC_STATE_FOCUSED     =   wx.LIST_STATE_FOCUSED
 ULC_STATE_SELECTED    =   wx.LIST_STATE_SELECTED
 ULC_STATE_CUT         =   wx.LIST_STATE_CUT              # MSW only
-ULC_STATE_DISABLED    =   wx.LIST_STATE_DISABLED         # OS2 only
-ULC_STATE_FILTERED    =   wx.LIST_STATE_FILTERED         # OS2 only
-ULC_STATE_INUSE       =   wx.LIST_STATE_INUSE            # OS2 only
-ULC_STATE_PICKED      =   wx.LIST_STATE_PICKED           # OS2 only
-ULC_STATE_SOURCE      =   wx.LIST_STATE_SOURCE           # OS2 only
 
 # Hit test flags, used in HitTest
 ULC_HITTEST_ABOVE           = wx.LIST_HITTEST_ABOVE            # Above the client area.
@@ -5628,7 +5622,7 @@ class UltimateListHeaderWindow(wx.Control):
 
                 evt = (self._isFooter and [wxEVT_COMMAND_LIST_FOOTER_CHECKED] or [wxEVT_COMMAND_LIST_COL_CHECKED])[0]
                 self.SendListEvent(evt, pos)
-                
+
                 return True
 
         return False
