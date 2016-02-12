@@ -2,6 +2,9 @@
 wxPython Project Phoenix
 =========================
 
+.. image:: https://travis-ci.org/ssbb/Phoenix.svg?branch=master
+    :target: https://travis-ci.org/ssbb/Phoenix
+
 .. image:: demo/bitmaps/splash.png
    :align: center
 
@@ -369,4 +372,3 @@ https://groups.google.com/forum/#!forum/wxpython-dev and join in.
 
 .. image:: docs/phoenix-fire-md.png
    :width: 100%
-
