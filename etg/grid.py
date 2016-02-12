@@ -308,16 +308,20 @@ def run():
 
     module.addPyCode("PyGridTableBase = wx.deprecated(GridTableBase, 'Use GridTableBase instead.')")
 
-
     #-----------------------------------------------------------------
     c = module.find('wxGridTableMessage')
     c.addPrivateCopyCtor()
-
 
     #-----------------------------------------------------------------
     c = module.find('wxGrid')
     tools.fixWindowClass(c, ignoreProtected=False)
     c.bases = ['wxScrolledWindow']
+
+    # Ignore since it's only in 2.8 compability mode
+    c.find('SetCellAlignment').findOverload(
+        'int align, int row, int col').ignore()
+    for overload in c.find('SetCellTextColour').overloads:
+        overload.ignore()
 
     c.find('GetColLabelAlignment.horiz').out = True
     c.find('GetColLabelAlignment.vert').out = True
@@ -328,7 +332,6 @@ def run():
     c.find('GetCellAlignment.vert').out = True
     c.find('GetDefaultCellAlignment.horiz').out = True
     c.find('GetDefaultCellAlignment.vert').out = True
-
 
     c.find('RegisterDataType.renderer').transfer = True
     c.find('RegisterDataType.editor').transfer = True

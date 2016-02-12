@@ -161,6 +161,9 @@ def run():
         """)
     c.addPyProperty('Menus GetMenus SetMenus')
 
+    c.find('GetLabelTop').ignore()
+    c.find('SetLabelTop').ignore()
+
     module.addItem(tools.wxListWrapperTemplate('wxMenuList', 'wxMenu', module))
 
     #-----------------------------------------------------------------

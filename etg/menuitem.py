@@ -145,9 +145,13 @@ def run():
     c.find('GetAccelFromString').ignore()  # Not implemented anywere?
     c.find('GetLabelFromText').ignore()
 
+    c.find('GetText').ignore()
+    c.find('SetText').ignore()
+    c.find('GetName').ignore()
+
     module.addItem(tools.wxListWrapperTemplate('wxMenuItemList', 'wxMenuItem', module))
 
-
+    c.find('GetLabel').ignore()
 
     #-----------------------------------------------------------------
     tools.doCommonTweaks(module)
