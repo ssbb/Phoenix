@@ -1,2 +1,0 @@
-    
-    mySVGFileDC.SetBitmapHandler(wx.SVGBitmapEmbedHandler())

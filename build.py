@@ -421,10 +421,7 @@ def makeOptionParser():
             action = 'store_true'
         parser.add_option('--'+opt, default=default, action=action,
                           dest=opt, help=txt)
-<<<<<<< HEAD
 
-=======
->>>>>>> upstream/master
     return parser
 
 
@@ -635,16 +632,12 @@ def uploadPackage(fileName, options, mask=defaultMask, keep=50):
     # idenity file, etc needed for making an SSH connection to the
     # snapshots server.
     host = 'wxpython-rbot'
-<<<<<<< HEAD
-    snapshotDir = 'snapshot-builds'
 
-=======
     if options.release_build:
         uploadDir = 'release-builds'
     else:
         uploadDir = 'snapshot-builds'
 
->>>>>>> upstream/master
     # copy the new file to the server
     cmd = 'scp {} {}:{}'.format(fileName, host, uploadDir)
     #msg(cmd)
@@ -961,11 +954,7 @@ def cmd_docs_bdist(options, args):
     tarball.close()
 
     if options.upload:
-<<<<<<< HEAD
-        uploadPackage(tarfilename, keep=5,
-=======
         uploadPackage(tarfilename, options, keep=5,
->>>>>>> upstream/master
                       mask='%s-docs-%s*' % (baseName, cfg.VER_MAJOR))
 
     msg('Documentation tarball built at %s' % tarfilename)
@@ -1167,24 +1156,14 @@ def cmd_build_wx(options, args):
         from buildtools import build_wxwidgets as wxbuild
 
         print('wxWidgets build options: ' + str(build_options))
-<<<<<<< HEAD
-        wxbuild.main(wxscript, build_options)
-
-=======
         wxbuild.main(wxDir(), build_options)
 
->>>>>>> upstream/master
         # build again without the --debug flag?
         if isWindows and options.both:
             build_options.remove('--debug')
             print('wxWidgets build options: ' + str(build_options))
-<<<<<<< HEAD
-            wxbuild.main(wxscript, build_options)
-
-=======
             wxbuild.main(wxDir(), build_options)
 
->>>>>>> upstream/master
     except Exception:
         print("ERROR: failed building wxWidgets")
         import traceback
@@ -1398,13 +1377,7 @@ def cmd_bdist_egg(options, args):
         filemask = "dist/%s-%s-*.egg" % (baseName, cfg.VERSION.replace('-', '_'))
         filenames = glob.glob(filemask)
         assert len(filenames) == 1
-<<<<<<< HEAD
-        uploadPackage(filenames[0])
-
-=======
         uploadPackage(filenames[0], options)
-
->>>>>>> upstream/master
 
 def cmd_bdist_wheel(options, args):
     _doSimpleSetupCmd(options, args, 'bdist_wheel')
@@ -1413,15 +1386,9 @@ def cmd_bdist_wheel(options, args):
         filemask = "dist/%s-%s-*.whl" % (baseName, cfg.VERSION.replace('-', '_'))
         filenames = glob.glob(filemask)
         assert len(filenames) == 1
-<<<<<<< HEAD
-        uploadPackage(filenames[0])
-
-
-=======
         uploadPackage(filenames[0], options)
 
 
->>>>>>> upstream/master
 def cmd_bdist_wininst(options, args):
     _doSimpleSetupCmd(options, args, 'bdist_wininst')
     cfg = Config()
@@ -1578,13 +1545,7 @@ def cmd_sdist(options, args):
     WDEST = posixjoin(PDEST, 'ext/wxWidgets')
     if not os.path.exists(PDEST):
         os.makedirs(PDEST)
-<<<<<<< HEAD
-    #if not os.path.exists(WDEST):
-    #    os.makedirs(WDEST)
 
-=======
-
->>>>>>> upstream/master
     # and a place to put the final tarball
     if not os.path.exists('dist'):
         os.mkdir('dist')
@@ -1635,13 +1596,8 @@ def cmd_sdist(options, args):
     shutil.rmtree(PDEST)
 
     if options.upload:
-<<<<<<< HEAD
-        uploadPackage(tarfilename)
-
-=======
         uploadPackage(tarfilename, options)
 
->>>>>>> upstream/master
     msg("Source release built at %s" % tarfilename)
 
 
@@ -1691,13 +1647,8 @@ def cmd_bdist(options, args):
     tarball.close()
 
     if options.upload:
-<<<<<<< HEAD
-        uploadPackage(tarfilename)
-
-=======
         uploadPackage(tarfilename, options)
 
->>>>>>> upstream/master
     msg("Binary release built at %s" % tarfilename)
 
 
@@ -1724,10 +1675,6 @@ def cmd_setrev(options, args):
 
     cfg = Config()
     cfg.resetVersion()
-<<<<<<< HEAD
-    msg('REV.txt set to "%s"' % svnrev)
-=======
->>>>>>> upstream/master
     msg('cfg.VERSION: %s' % cfg.VERSION)
 
 
