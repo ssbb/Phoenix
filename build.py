@@ -149,9 +149,6 @@ def main(args):
     os.environ['PYTHONPATH'] = phoenixDir()
     os.environ['PYTHONUNBUFFERED'] = 'yes'
     os.environ['WXWIN'] = wxDir()
-    cfg = Config(noWxConfig=True)
-    msg('cfg.VERSION: %s' % cfg.VERSION)
-    msg('')
 
     wxpydir = os.path.join(phoenixDir(), "wx")
     if not os.path.exists(wxpydir):
@@ -162,6 +159,9 @@ def main(args):
         sys.exit(1)
 
     options, commands = parseArgs(args)
+    cfg = Config(noWxConfig=True)
+    msg('cfg.VERSION: %s' % cfg.VERSION)
+    msg('')
 
     while commands:
         # ensure that each command starts with the CWD being the phoenix dir.
@@ -410,6 +410,7 @@ def makeOptionParser():
         ("x64",            (False, "Use and build for the 64bit version of Python on Windows")),
         ("jom",            (False, "Use jom instead of nmake for the wxMSW build")),
         ("relwithdebug",   (False, "Turn on the generation of debug info for release builds on MSW.")),
+        ("release_build",  (False, "Turn off some development options for a release build.")),
         ]
 
     parser = optparse.OptionParser("build options:")
@@ -420,19 +421,33 @@ def makeOptionParser():
             action = 'store_true'
         parser.add_option('--'+opt, default=default, action=action,
                           dest=opt, help=txt)
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
     return parser
 
 
 def parseArgs(args):
     parser = makeOptionParser()
     options, args = parser.parse_args(args)
+
     if isWindows:
         # We always use magic on Windows
         options.no_magic = False
         options.use_syswx = False
     elif options.use_syswx:
+        # Turn off magic if using the system wx
         options.no_magic = True
+
+    # Some options don't make sense for release builds
+    if options.release_build:
+        options.debug = False
+        options.both = False
+        options.relwithdebug = False
+        if os.path.exists('REV.txt'):
+            os.unlink('REV.txt')
+
     return options, args
 
 
@@ -605,7 +620,7 @@ class CommandTimer(object):
         msg('Finished command: %s (%s)' % (self.name, time))
 
 
-def uploadPackage(fileName, mask=defaultMask, keep=50):
+def uploadPackage(fileName, options, mask=defaultMask, keep=50):
     """
     Upload the given filename to the configured package server location. Only
     the `keep` most recent files matching `mask` will be kept so the server
@@ -620,29 +635,37 @@ def uploadPackage(fileName, mask=defaultMask, keep=50):
     # idenity file, etc needed for making an SSH connection to the
     # snapshots server.
     host = 'wxpython-rbot'
+<<<<<<< HEAD
     snapshotDir = 'snapshot-builds'
 
+=======
+    if options.release_build:
+        uploadDir = 'release-builds'
+    else:
+        uploadDir = 'snapshot-builds'
+
+>>>>>>> upstream/master
     # copy the new file to the server
-    cmd = 'scp {} {}:{}'.format(fileName, host, snapshotDir)
-    msg(cmd)
+    cmd = 'scp {} {}:{}'.format(fileName, host, uploadDir)
+    #msg(cmd)
     runcmd(cmd)
 
     # Make sure it is readable by all
-    cmd = 'ssh {} "cd {}; chmod a+r {}"'.format(host, snapshotDir, os.path.basename(fileName))
+    cmd = 'ssh {} "cd {}; chmod a+r {}"'.format(host, uploadDir, os.path.basename(fileName))
     runcmd(cmd)
 
     # get the list of all snapshot files on the server
-    cmd = 'ssh {} "cd {}; ls {}"'.format(host, snapshotDir, mask)
+    cmd = 'ssh {} "cd {}; ls {}"'.format(host, uploadDir, mask)
     allFiles = runcmd(cmd, getOutput=True)
     allFiles = allFiles.strip().split('\n')
     allFiles.sort()
 
-    # Leave the last keep builds, including this new one, on the server.
+    # Leave the last keep number of builds, including this new one, on the server.
     # Delete the rest.
     rmFiles = allFiles[:-keep]
     if rmFiles:
         msg("Deleting %s" % ", ".join(rmFiles))
-        cmd = 'ssh {} "cd {}; rm {}"'.format(host, snapshotDir, " ".join(rmFiles))
+        cmd = 'ssh {} "cd {}; rm {}"'.format(host, uploadDir, " ".join(rmFiles))
         runcmd(cmd)
 
     msg("Upload complete!")
@@ -938,7 +961,11 @@ def cmd_docs_bdist(options, args):
     tarball.close()
 
     if options.upload:
+<<<<<<< HEAD
         uploadPackage(tarfilename, keep=5,
+=======
+        uploadPackage(tarfilename, options, keep=5,
+>>>>>>> upstream/master
                       mask='%s-docs-%s*' % (baseName, cfg.VER_MAJOR))
 
     msg('Documentation tarball built at %s' % tarfilename)
@@ -1137,19 +1164,27 @@ def cmd_build_wx(options, args):
 
     try:
         # Import and run the wxWidgets build script
-        wxscript = os.path.join(wxDir(), "build/tools/build-wxwidgets.py")
-        sys.path.insert(0, os.path.dirname(wxscript))
-        wxbuild = __import__('build-wxwidgets')
+        from buildtools import build_wxwidgets as wxbuild
 
         print('wxWidgets build options: ' + str(build_options))
+<<<<<<< HEAD
         wxbuild.main(wxscript, build_options)
 
+=======
+        wxbuild.main(wxDir(), build_options)
+
+>>>>>>> upstream/master
         # build again without the --debug flag?
         if isWindows and options.both:
             build_options.remove('--debug')
             print('wxWidgets build options: ' + str(build_options))
+<<<<<<< HEAD
             wxbuild.main(wxscript, build_options)
 
+=======
+            wxbuild.main(wxDir(), build_options)
+
+>>>>>>> upstream/master
     except Exception:
         print("ERROR: failed building wxWidgets")
         import traceback
@@ -1363,8 +1398,13 @@ def cmd_bdist_egg(options, args):
         filemask = "dist/%s-%s-*.egg" % (baseName, cfg.VERSION.replace('-', '_'))
         filenames = glob.glob(filemask)
         assert len(filenames) == 1
+<<<<<<< HEAD
         uploadPackage(filenames[0])
 
+=======
+        uploadPackage(filenames[0], options)
+
+>>>>>>> upstream/master
 
 def cmd_bdist_wheel(options, args):
     _doSimpleSetupCmd(options, args, 'bdist_wheel')
@@ -1373,9 +1413,15 @@ def cmd_bdist_wheel(options, args):
         filemask = "dist/%s-%s-*.whl" % (baseName, cfg.VERSION.replace('-', '_'))
         filenames = glob.glob(filemask)
         assert len(filenames) == 1
+<<<<<<< HEAD
         uploadPackage(filenames[0])
 
 
+=======
+        uploadPackage(filenames[0], options)
+
+
+>>>>>>> upstream/master
 def cmd_bdist_wininst(options, args):
     _doSimpleSetupCmd(options, args, 'bdist_wininst')
     cfg = Config()
@@ -1383,7 +1429,7 @@ def cmd_bdist_wininst(options, args):
         filemask = "dist/%s-%s-*.exe" % (baseName, cfg.VERSION.replace('-', '_'))
         filenames = glob.glob(filemask)
         assert len(filenames) == 1
-        uploadPackage(filenames[0])
+        uploadPackage(filenames[0], options)
 
 
 # bdist_msi requires the version number to be only 3 components, but we're
@@ -1532,9 +1578,13 @@ def cmd_sdist(options, args):
     WDEST = posixjoin(PDEST, 'ext/wxWidgets')
     if not os.path.exists(PDEST):
         os.makedirs(PDEST)
+<<<<<<< HEAD
     #if not os.path.exists(WDEST):
     #    os.makedirs(WDEST)
 
+=======
+
+>>>>>>> upstream/master
     # and a place to put the final tarball
     if not os.path.exists('dist'):
         os.mkdir('dist')
@@ -1565,8 +1615,6 @@ def cmd_sdist(options, args):
         copyFile('REV.txt', PDEST)
 
     # Add some extra stuff to the root folder
-    #copyFile('packaging/setup.py', ADEST)
-    #copyFile('packaging/README-sdist.txt', opj(ADEST, 'README.txt'))
     cmd_egg_info(options, args, egg_base=PDEST)
     copyFile(opj(PDEST, 'wxPython_Phoenix.egg-info/PKG-INFO'),
              opj(PDEST, 'PKG-INFO'))
@@ -1587,8 +1635,13 @@ def cmd_sdist(options, args):
     shutil.rmtree(PDEST)
 
     if options.upload:
+<<<<<<< HEAD
         uploadPackage(tarfilename)
 
+=======
+        uploadPackage(tarfilename, options)
+
+>>>>>>> upstream/master
     msg("Source release built at %s" % tarfilename)
 
 
@@ -1638,8 +1691,13 @@ def cmd_bdist(options, args):
     tarball.close()
 
     if options.upload:
+<<<<<<< HEAD
         uploadPackage(tarfilename)
 
+=======
+        uploadPackage(tarfilename, options)
+
+>>>>>>> upstream/master
     msg("Binary release built at %s" % tarfilename)
 
 
@@ -1651,14 +1709,25 @@ def cmd_setrev(options, args):
     cmdTimer = CommandTimer('setrev')
     assert os.getcwd() == phoenixDir()
 
-    svnrev = getVcsRev()
-    f = open('REV.txt', 'w')
-    svnrev = '.dev'+svnrev
-    f.write(svnrev)
-    f.close()
+    if options.release_build:
+        # Ignore this command for release builds, they are not supposed to
+        # include current VCS revision info in the version number.
+        msg('This is a release build, setting REV.txt skipped')
+
+    else:
+        svnrev = getVcsRev()
+        f = open('REV.txt', 'w')
+        svnrev = '.dev'+svnrev
+        f.write(svnrev)
+        f.close()
+        msg('REV.txt set to "%s"' % svnrev)
+
     cfg = Config()
     cfg.resetVersion()
+<<<<<<< HEAD
     msg('REV.txt set to "%s"' % svnrev)
+=======
+>>>>>>> upstream/master
     msg('cfg.VERSION: %s' % cfg.VERSION)
 
 

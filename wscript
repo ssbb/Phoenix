@@ -73,12 +73,8 @@ def configure(conf):
         # version. We have a chicken-egg problem here. The compiler needs to
         # be selected before the Python stuff can be configured, but we need
         # Python to know what version of the compiler to use.
-        # TODO: Fix this
-        msvc_version = '9.0' #conf.options.msvc_ver
-        if conf.options.python and ('33' in conf.options.python or
-                                    '34' in conf.options.python):
-            msvc_version = '10.0'
-
+        import distutils.msvc9compiler
+        msvc_version = str( distutils.msvc9compiler.get_build_version() )
         conf.env['MSVC_VERSIONS'] = ['msvc ' + msvc_version]
         conf.env['MSVC_TARGETS'] = [conf.options.msvc_arch]
         conf.load('msvc')
@@ -138,6 +134,10 @@ def configure(conf):
 
         _copyEnvGroup(conf.env, '_WX', '_WXRICHTEXT')
         conf.env.LIB_WXRICHTEXT += cfg.makeLibName('richtext')
+
+        _copyEnvGroup(conf.env, '_WX', '_WXMEDIA')
+        conf.env.LIB_WXMEDIA += cfg.makeLibName('media')
+
 
         # ** Add code for new modules here (and below for non-MSW)
 
@@ -561,6 +561,14 @@ def build(bld):
         uselib   = 'WXHTML WXRICHTEXT WXPY',
         )
     makeExtCopyRule(bld, '_richtext')
+
+    etg = loadETG('etg/_media.py')
+    bld(features = 'c cxx cxxshlib pyext',
+        target   = makeTargetName(bld, '_media'),
+        source   = getEtgSipCppFiles(etg) + rc,
+        uselib   = 'WX WXPY WXMEDIA',
+        )
+    makeExtCopyRule(bld, '_media')
 
 
 

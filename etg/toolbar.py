@@ -45,7 +45,7 @@ def run():
     c = module.find('wxToolBarToolBase')
     assert isinstance(c, etgtools.ClassDef)
     c.abstract = True
-    tools.removeVirtuals(c)
+    # tools.removeVirtuals(c)
     _fixClientData(c)
 
     # Switch all wxToolBarBase to wxToolBar
