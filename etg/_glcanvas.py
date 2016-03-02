@@ -74,33 +74,32 @@ def run():
 
     # We already have a MappedType for wxArrayInt, so just tweak the
     # interfaces to use that instead of a const int pointer.
-    # c.find('wxGLCanvas').ignore()
+    for overload in c.find('wxGLCanvas').overloads:
+        overload.ignore()
 
-    # m = c.addCppCtor_sip(
-    #     argsString="""(
-    #          wxWindow* parent, wxWindowID id=wxID_ANY, wxArrayInt* attribList=NULL,
-    #          const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize,
-    #          long style=0, const wxString& name="GLCanvas",
-    #          const wxPalette& palette=wxNullPalette)""",
-    #     cppSignature="""(
-    #          wxWindow* parent, wxWindowID id=wxID_ANY, const int* attribList=NULL,
-    #          const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize,
-    #          long style=0, const wxString& name="GLCanvas",
-    #          const wxPalette& palette=wxNullPalette)""",
-    #     pyArgsString="(self, parent, id=ID_ANY, attribList=None, pos=DefaultPosition, size=DefaultSize, style=0, name='GLCanvas', palette=NullPalette)",
-    #     body="""\
-    #         const int* attribPtr = NULL;
-    #         if (attribList)
-    #             attribPtr = &attribList->front();
-    #         sipCpp = new sipwxGLCanvas(parent, id, attribPtr, *pos, *size, style, *name, *palette);
-    #         """,
-    #     noDerivedCtor=False,
-    #     )
+    m = c.addCppCtor_sip(
+        argsString="""(
+             wxWindow* parent, wxWindowID id=wxID_ANY, wxArrayInt* attribList=NULL,
+             const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize,
+             long style=0, const wxString& name="GLCanvas",
+             const wxPalette& palette=wxNullPalette)""",
+        cppSignature="""(
+             wxWindow* parent, wxWindowID id=wxID_ANY, const int* attribList=NULL,
+             const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize,
+             long style=0, const wxString& name="GLCanvas",
+             const wxPalette& palette=wxNullPalette)""",
+        pyArgsString="(self, parent, id=ID_ANY, attribList=None, pos=DefaultPosition, size=DefaultSize, style=0, name='GLCanvas', palette=NullPalette)",
+        body="""\
+            const int* attribPtr = NULL;
+            if (attribList)
+                attribPtr = &attribList->front();
+            sipCpp = new sipwxGLCanvas(parent, id, attribPtr, *pos, *size, style, *name, *palette);
+            """,
+        noDerivedCtor=False)
 
+    module.find('wxGLAttribsBase').find('GetGLAttrs').ignore()
 
-
-
-    m = c.find('IsDisplaySupported')
+    m = c.find('IsDisplaySupported').findOverload('(const int *attribList)')
     m.find('attribList').type = 'wxArrayInt*'
     m.setCppCode_sip("""\
         const int* attribPtr = NULL;
